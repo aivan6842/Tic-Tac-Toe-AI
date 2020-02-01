@@ -1,3 +1,9 @@
+/**
+* This is a TicTacToe game which uses the minimax algorithm to pick the optimal
+* move for the computer.
+* @author Alexei Ivanov
+*/
+
 import java.lang.StringBuilder;
 import java.util.Scanner;
 
@@ -6,13 +12,17 @@ public class TicTacToe{
    private CellValue[][] board;
    private Scanner sc = new Scanner(System.in);
 
+   //Constructor for the game
    public TicTacToe(){
-      this.board = new CellValue[3][3];
-      fillEmpty();
-      play();
+      this.board = new CellValue[3][3]; // initialize board
+      fillEmpty(); //fill board with empty CellValue's
+      play(); //start the game.
       sc.close();
    }
 
+   /**
+   * floods the board with empty cells
+   */
    private void fillEmpty(){
       for (int i=0;i<3;i++){
          for (int j =0;j<3;j++){
@@ -21,6 +31,11 @@ public class TicTacToe{
       }
    }
 
+   /**
+   * Makes sure that the users move is valid and then returns an arrays
+   * containing the row and column of the desired move of the player.
+   * @return an array of length 2. (arr[0] = row and arr[1] = col)
+   */
    private int[] getMoveLocation(){
       int[] ret;
       Boolean validnum = false;
@@ -77,6 +92,10 @@ public class TicTacToe{
       return new int[] {row, col};
    }
 
+   /**
+   * Starts playing the game. Asks for user move and automatically makes the
+   * computer move too. Game will end with either a win or a draw.
+   */
    private void play(){
       do {
          int[] aiMove = findBestMove();
@@ -99,8 +118,13 @@ public class TicTacToe{
       sc.close();
    }
 
+   /**
+   * Checks if the game is over. If X wins then it returns 10 to quantify the
+   * win, if O wins then it returns -10, and returns 0 on a draw or not a win.
+   * @return integer quantifing the win.
+   */
    private int checkWin(){
-      //rows
+      //check rows for a potential win
       for (int i=0;i<3;i++){
          if (board[i][0] == board[i][1] && board[i][1] == board[i][2]){
                if (board[i][0] == CellValue.X){
@@ -112,7 +136,7 @@ public class TicTacToe{
          }
       }
 
-      // columns
+      // check columsn for a potential win
       for (int j=0;j<3;j++){
          if (board[0][j] == board[1][j] && board[1][j] == board[2][j]){
             if (board[0][j] == CellValue.X){
@@ -124,7 +148,7 @@ public class TicTacToe{
          }
       }
 
-      //diagonals
+      //check diagonals for a potential win
       if (board[0][0] == board[1][1] && board[1][1] == board[2][2]){
          if (board[0][0] == CellValue.X){
             return 10;
@@ -143,9 +167,15 @@ public class TicTacToe{
          }
       }
 
+      // draw or no one has won yet.
       return 0;
    }
 
+   /**
+   * Returns true if there are still moves left to be played. Returns false
+   * if there are no more moves to be played. Used in code to check for draw.
+   * @return boolean representing if there are or aren't moves remaining.
+   */
    private boolean movesLeft(){
       for (int i=0;i<3;i++){
          for (int j=0;j<3;j++){
@@ -157,20 +187,37 @@ public class TicTacToe{
       return false;
    }
 
-   private int minimax(int depth, Boolean isMax){
+   /**
+   * Minimax algorithm used to evaluate all possible move combinations
+   * recursively. An integer is returned to represent the strength of the move.
+   * A return of -10 would represent a combination where the player(O) wins.
+   * A return of 10 would represent a combination where the AI(X) wins.
+   * The depth of the combination is subtracted from the AI's score and added to
+   * the players score so to that it will account for earlier wins or earlier
+   * losses and choose the most advantageous position.
+   *
+   * @param depth represents the depth of the combination
+   * @param isMax if true, then it is the AI's move, if false then players move
+   * @return represents the strength of the move
+   */
 
+   private int minimax(int depth, Boolean isMax){
       int score = checkWin();
 
+      //if X wins return 10
       if (score == 10){
          return score;
       }
+      // if O wins return -10
       if (score == -10){
          return score;
       }
+      //if draw return 0
       if (!movesLeft()){
          return 0;
       }
 
+      // if AI find the maximizing score by calculating score from all positions
       if (isMax){
          int best = -1000;
          for (int i=0;i<3;i++){
@@ -182,9 +229,12 @@ public class TicTacToe{
                }
             }
          }
+         // account for the depth
          return best - depth;
       }
 
+      // if players turn consider that he plays optimally and find which
+      // move he is likely to play
       else{
          int best = 1000;
          for (int i=0;i<3;i++){
@@ -196,9 +246,17 @@ public class TicTacToe{
                }
             }
          }
+         //account for depth
          return best + depth;
       }
    }
+
+   /**
+   * Finds the best move to play by playing in every position and calling
+   * minimax to evaluate the strength of the specific move.Returns an array
+   * containing the row and column for the best move.
+   * @return array with best move coordinates. (arr[0] = row and arr[1] = column)
+   */
 
    private int[] findBestMove(){
       int bestVal = -1000;
@@ -220,6 +278,11 @@ public class TicTacToe{
       }
       return move;
    }
+
+   /**
+   * Returns the string representation of the game state.
+   * @return the current game state in a string representation.
+   */
 
    public String toString(){
        StringBuilder sb = new StringBuilder();
